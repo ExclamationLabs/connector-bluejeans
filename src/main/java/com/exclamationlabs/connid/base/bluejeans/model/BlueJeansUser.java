@@ -13,11 +13,9 @@
 
 package com.exclamationlabs.connid.base.bluejeans.model;
 
-import com.exclamationlabs.connid.base.connector.model.UserIdentityModel;
+import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 
-import java.util.List;
-
-public class BlueJeansUser implements UserIdentityModel {
+public class BlueJeansUser implements IdentityModel {
 
     private String firstName;
     private String lastName;
@@ -36,16 +34,6 @@ public class BlueJeansUser implements UserIdentityModel {
     private Long enterpriseJoinDate;
 
     private BlueJeansUserRoomSettings roomSettings;
-
-    @Override
-    public String getAssignedGroupsAttributeName() {
-        return null;
-    }
-
-    @Override
-    public List<String> getAssignedGroupIds() {
-        return null;
-    }
 
     @Override
     public String getIdentityIdValue() {

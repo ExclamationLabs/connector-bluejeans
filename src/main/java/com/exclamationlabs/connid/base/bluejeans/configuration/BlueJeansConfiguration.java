@@ -14,11 +14,8 @@
 package com.exclamationlabs.connid.base.bluejeans.configuration;
 
 import com.exclamationlabs.connid.base.connector.configuration.BaseConnectorConfiguration;
-import com.exclamationlabs.connid.base.connector.configuration.ConnectorProperty;
 import org.identityconnectors.framework.spi.ConfigurationClass;
 import org.identityconnectors.framework.spi.ConfigurationProperty;
-
-import java.util.Properties;
 
 @ConfigurationClass(skipUnsupported = true,
         ignore = {"credentialAccessToken", "midPointConfigurationFilePath"})
@@ -38,6 +35,6 @@ public class BlueJeansConfiguration extends BaseConnectorConfiguration {
             helpMessageKey = "File path for the BlueJeans Configuration File",
             required = true)
     public String getConfigurationFilePath() {
-        return getMidPointConfigurationFilePath();
+        return innerGetMidPointConfigurationFilePath();
     }
 }

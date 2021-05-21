@@ -13,23 +13,122 @@
 
 package com.exclamationlabs.connid.base.bluejeans.adapter;
 
-import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansGroup;
 import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansUser;
 import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansUserRoomSettings;
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
-import com.exclamationlabs.connid.base.connector.adapter.BaseUsersAdapter;
+import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
+import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
-import org.identityconnectors.framework.common.objects.ConnectorObject;
+import org.identityconnectors.framework.common.objects.ObjectClass;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static com.exclamationlabs.connid.base.bluejeans.attribute.BlueJeansUserAttribute.*;
+import static com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType.*;
+import static org.identityconnectors.framework.common.objects.AttributeInfo.Flags.NOT_CREATABLE;
+import static org.identityconnectors.framework.common.objects.AttributeInfo.Flags.NOT_UPDATEABLE;
 
-public class BlueJeansUsersAdapter extends BaseUsersAdapter<BlueJeansUser, BlueJeansGroup> {
+public class BlueJeansUsersAdapter extends BaseAdapter<BlueJeansUser> {
+
     @Override
-    protected BlueJeansUser constructUser(Set<Attribute> attributes, boolean creation) {
+    public ObjectClass getType() {
+        return ObjectClass.ACCOUNT;
+    }
 
+    @Override
+    public Class<BlueJeansUser> getIdentityModelClass() {
+        return BlueJeansUser.class;
+    }
+
+    @Override
+    public List<ConnectorAttribute> getConnectorAttributes() {
+        List<ConnectorAttribute> result = new ArrayList<>();
+        result.add(new ConnectorAttribute(USER_ID.name(), LONG, NOT_UPDATEABLE));
+        result.add(new ConnectorAttribute(FIRST_NAME.name(), STRING));
+        result.add(new ConnectorAttribute(LAST_NAME.name(), STRING));
+        result.add(new ConnectorAttribute(MIDDLE_NAME.name(), STRING));
+        result.add(new ConnectorAttribute(EMAIL_ID.name(), STRING));
+        result.add(new ConnectorAttribute(USERNAME.name(), STRING));
+        result.add(new ConnectorAttribute(ENTERPRISE_JOIN_DATE.name(), LONG, NOT_CREATABLE, NOT_UPDATEABLE));
+        result.add(new ConnectorAttribute(IS_ENTERPRISE_ADMIN.name(), BOOLEAN, NOT_CREATABLE, NOT_UPDATEABLE));
+        result.add(new ConnectorAttribute(URI.name(), STRING, NOT_CREATABLE, NOT_UPDATEABLE));
+        result.add(new ConnectorAttribute(PASSWORD.name(), STRING, NOT_UPDATEABLE));
+        result.add(new ConnectorAttribute(COMPANY.name(), STRING));
+        result.add(new ConnectorAttribute(TITLE.name(), STRING));
+
+        result.add(new ConnectorAttribute(ROOM_ID.name(), STRING, NOT_CREATABLE, NOT_UPDATEABLE));
+        result.add(new ConnectorAttribute(ROOM_NAME.name(), STRING));
+        result.add(new ConnectorAttribute(ORIGIN_POP_ID.name(), INTEGER));
+        result.add(new ConnectorAttribute(IS_LARGE_MEETING.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(BACKGROUND_IMAGE.name(), STRING));
+        result.add(new ConnectorAttribute(IS_MODERATOR_LESS.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(WELCOME_MESSAGE.name(), STRING));
+        result.add(new ConnectorAttribute(DISALLOW_CHAT.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(ENCRYPTION_TYPE.name(), STRING));
+        result.add(new ConnectorAttribute(SHOW_ALL_PARTICIPANTS_IN_ICS.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(PARTICIPANT_PASSCODE.name(), STRING));
+        result.add(new ConnectorAttribute(PUBLISH_MEETING.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(VIDEO_BEST_FIT.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(MUTE_PARTICIPANTS_ON_ENTRY.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(ENFORCE_MEETING_ENCRYPTION.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(ENFORCE_MEETING_ENCRYPTION_ALLOW_PSTN.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(IDLE_TIMEOUT.name(), INTEGER));
+        result.add(new ConnectorAttribute(DEFAULT_LAYOUT.name(), STRING));
+        result.add(new ConnectorAttribute(PLAY_AUDIO_ALERTS.name(), BOOLEAN));
+        result.add(new ConnectorAttribute(PERSONAL_MEETING_ID.name(), INTEGER));
+        result.add(new ConnectorAttribute(MODERATOR_PASSCODE.name(), STRING));
+
+        return result;
+    }
+
+    @Override
+    protected List<Attribute> constructAttributes(BlueJeansUser user) {
+        List<Attribute> attributes = new ArrayList<>();
+        attributes.add(AttributeBuilder.build(USER_ID.name(), user.getId()));
+        attributes.add(AttributeBuilder.build(EMAIL_ID.name(), user.getEmailId()));
+        attributes.add(AttributeBuilder.build(FIRST_NAME.name(), user.getFirstName()));
+        attributes.add(AttributeBuilder.build(MIDDLE_NAME.name(), user.getMiddleName()));
+        attributes.add(AttributeBuilder.build(LAST_NAME.name(), user.getLastName()));
+        attributes.add(AttributeBuilder.build(ENTERPRISE_JOIN_DATE.name(), user.getEnterpriseJoinDate()));
+        attributes.add(AttributeBuilder.build(USERNAME.name(), user.getUsername()));
+        attributes.add(AttributeBuilder.build(URI.name(), user.getUri()));
+        attributes.add(AttributeBuilder.build(COMPANY.name(), user.getCompany()));
+        attributes.add(AttributeBuilder.build(TITLE.name(), user.getTitle()));
+
+        if (user.getRoomSettings() != null) {
+
+            attributes.add(AttributeBuilder.build(ROOM_ID.name(), user.getRoomSettings().getNumericId()));
+            attributes.add(AttributeBuilder.build(ROOM_NAME.name(), user.getRoomSettings().getName()));
+            attributes.add(AttributeBuilder.build(ORIGIN_POP_ID.name(), user.getRoomSettings().getOriginPopId()));
+            attributes.add(AttributeBuilder.build(IS_LARGE_MEETING.name(), user.getRoomSettings().getLargeMeeting()));
+            attributes.add(AttributeBuilder.build(SHOW_VIDEO_ANIMATIONS.name(), user.getRoomSettings().getShowVideoAnimations()));
+            attributes.add(AttributeBuilder.build(BACKGROUND_IMAGE.name(), user.getRoomSettings().getBackgroundImage()));
+            attributes.add(AttributeBuilder.build(IS_MODERATOR_LESS.name(), user.getRoomSettings().getModeratorLess()));
+            attributes.add(AttributeBuilder.build(WELCOME_MESSAGE.name(), user.getRoomSettings().getWelcomeMessage()));
+            attributes.add(AttributeBuilder.build(DISALLOW_CHAT.name(), user.getRoomSettings().getDisallowChat()));
+            attributes.add(AttributeBuilder.build(ENCRYPTION_TYPE.name(), user.getRoomSettings().getEncryptionType()));
+            attributes.add(AttributeBuilder.build(SHOW_ALL_PARTICIPANTS_IN_ICS.name(), user.getRoomSettings().getShowAllParticipantsInIcs()));
+            attributes.add(AttributeBuilder.build(PARTICIPANT_PASSCODE.name(), user.getRoomSettings().getParticipantPasscode()));
+            attributes.add(AttributeBuilder.build(PUBLISH_MEETING.name(), user.getRoomSettings().getPublishMeeting()));
+            attributes.add(AttributeBuilder.build(VIDEO_BEST_FIT.name(), user.getRoomSettings().getVideoBestFit()));
+            attributes.add(AttributeBuilder.build(MUTE_PARTICIPANTS_ON_ENTRY.name(), user.getRoomSettings().getMuteParticipantsOnEntry()));
+            attributes.add(AttributeBuilder.build(ENFORCE_MEETING_ENCRYPTION.name(), user.getRoomSettings().getEnforceMeetingEncryption()));
+            attributes.add(AttributeBuilder.build(ENFORCE_MEETING_ENCRYPTION_ALLOW_PSTN.name(), user.getRoomSettings().getEnforceMeetingEncryptionAllowPSTN()));
+            attributes.add(AttributeBuilder.build(IDLE_TIMEOUT.name(), user.getRoomSettings().getIdleTimeout()));
+            attributes.add(AttributeBuilder.build(DEFAULT_LAYOUT.name(), user.getRoomSettings().getDefaultLayout()));
+            attributes.add(AttributeBuilder.build(PLAY_AUDIO_ALERTS.name(), user.getRoomSettings().getPlayAudioAlerts()));
+            attributes.add(AttributeBuilder.build(PERSONAL_MEETING_ID.name(), user.getRoomSettings().getPersonalMeetingId()));
+            attributes.add(AttributeBuilder.build(MODERATOR_PASSCODE.name(), user.getRoomSettings().getModeratorPasscode()));
+        }
+
+        return attributes;
+    }
+
+    @Override
+    protected BlueJeansUser constructModel(Set<Attribute> attributes, boolean creation) {
         BlueJeansUser user = new BlueJeansUser();
         String idValue = AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes);
         if (idValue != null) {
@@ -74,44 +173,5 @@ public class BlueJeansUsersAdapter extends BaseUsersAdapter<BlueJeansUser, BlueJ
 
         user.setRoomSettings(room);
         return user;
-    }
-
-    @Override
-    protected ConnectorObject constructConnectorObject(BlueJeansUser user) {
-        return getConnectorObjectBuilder(user)
-                .addAttribute(AttributeBuilder.build(USER_ID.name(), user.getId()))
-                .addAttribute(AttributeBuilder.build(EMAIL_ID.name(), user.getEmailId()))
-                .addAttribute(AttributeBuilder.build(FIRST_NAME.name(), user.getFirstName()))
-                .addAttribute(AttributeBuilder.build(MIDDLE_NAME.name(), user.getMiddleName()))
-                .addAttribute(AttributeBuilder.build(LAST_NAME.name(), user.getLastName()))
-                .addAttribute(AttributeBuilder.build(ENTERPRISE_JOIN_DATE.name(), user.getEnterpriseJoinDate()))
-                .addAttribute(AttributeBuilder.build(USERNAME.name(), user.getUsername()))
-                .addAttribute(AttributeBuilder.build(URI.name(), user.getUri()))
-                .addAttribute(AttributeBuilder.build(COMPANY.name(), user.getCompany()))
-                .addAttribute(AttributeBuilder.build(TITLE.name(), user.getTitle()))
-
-                .addAttribute(AttributeBuilder.build(ROOM_ID.name(), user.getRoomSettings().getNumericId()))
-                .addAttribute(AttributeBuilder.build(ROOM_NAME.name(), user.getRoomSettings().getName()))
-                .addAttribute(AttributeBuilder.build(ORIGIN_POP_ID.name(), user.getRoomSettings().getOriginPopId()))
-                .addAttribute(AttributeBuilder.build(IS_LARGE_MEETING.name(), user.getRoomSettings().getLargeMeeting()))
-                .addAttribute(AttributeBuilder.build(SHOW_VIDEO_ANIMATIONS.name(), user.getRoomSettings().getShowVideoAnimations()))
-                .addAttribute(AttributeBuilder.build(BACKGROUND_IMAGE.name(), user.getRoomSettings().getBackgroundImage()))
-                .addAttribute(AttributeBuilder.build(IS_MODERATOR_LESS.name(), user.getRoomSettings().getModeratorLess()))
-                .addAttribute(AttributeBuilder.build(WELCOME_MESSAGE.name(), user.getRoomSettings().getWelcomeMessage()))
-                .addAttribute(AttributeBuilder.build(DISALLOW_CHAT.name(), user.getRoomSettings().getDisallowChat()))
-                .addAttribute(AttributeBuilder.build(ENCRYPTION_TYPE.name(), user.getRoomSettings().getEncryptionType()))
-                .addAttribute(AttributeBuilder.build(SHOW_ALL_PARTICIPANTS_IN_ICS.name(), user.getRoomSettings().getShowAllParticipantsInIcs()))
-                .addAttribute(AttributeBuilder.build(PARTICIPANT_PASSCODE.name(), user.getRoomSettings().getParticipantPasscode()))
-                .addAttribute(AttributeBuilder.build(PUBLISH_MEETING.name(), user.getRoomSettings().getPublishMeeting()))
-                .addAttribute(AttributeBuilder.build(VIDEO_BEST_FIT.name(), user.getRoomSettings().getVideoBestFit()))
-                .addAttribute(AttributeBuilder.build(MUTE_PARTICIPANTS_ON_ENTRY.name(), user.getRoomSettings().getMuteParticipantsOnEntry()))
-                .addAttribute(AttributeBuilder.build(ENFORCE_MEETING_ENCRYPTION.name(), user.getRoomSettings().getEnforceMeetingEncryption()))
-                .addAttribute(AttributeBuilder.build(ENFORCE_MEETING_ENCRYPTION_ALLOW_PSTN.name(), user.getRoomSettings().getEnforceMeetingEncryptionAllowPSTN()))
-                .addAttribute(AttributeBuilder.build(IDLE_TIMEOUT.name(), user.getRoomSettings().getIdleTimeout()))
-                .addAttribute(AttributeBuilder.build(DEFAULT_LAYOUT.name(), user.getRoomSettings().getDefaultLayout()))
-                .addAttribute(AttributeBuilder.build(PLAY_AUDIO_ALERTS.name(), user.getRoomSettings().getPlayAudioAlerts()))
-                .addAttribute(AttributeBuilder.build(PERSONAL_MEETING_ID.name(), user.getRoomSettings().getPersonalMeetingId()))
-                .addAttribute(AttributeBuilder.build(MODERATOR_PASSCODE.name(), user.getRoomSettings().getModeratorPasscode()))
-                .build();
     }
 }

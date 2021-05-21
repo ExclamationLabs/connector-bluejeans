@@ -13,14 +13,12 @@
 
 package com.exclamationlabs.connid.base.bluejeans;
 
-import com.exclamationlabs.connid.base.bluejeans.attribute.BlueJeansGroupAttribute;
 import com.exclamationlabs.connid.base.bluejeans.configuration.BlueJeansConfiguration;
 import com.exclamationlabs.connid.base.connector.configuration.ConfigurationNameBuilder;
 import com.exclamationlabs.connid.base.connector.test.IntegrationTest;
 import com.exclamationlabs.connid.base.connector.test.util.ConnectorTestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.identityconnectors.framework.common.exceptions.AlreadyExistsException;
-import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.*;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -39,7 +37,7 @@ public class BlueJeansConnectorIntegrationTest extends IntegrationTest {
     private BlueJeansConnector connector;
 
     private static String generatedUserId;
-    private static long randomSuffix;
+    private static final long randomSuffix;
 
     static {
         Random random = new Random();
@@ -139,44 +137,6 @@ public class BlueJeansConnectorIntegrationTest extends IntegrationTest {
         connector.executeQuery(ObjectClass.ACCOUNT, generatedUserId, resultsHandler, new OperationOptionsBuilder().build());
         assertEquals(1, idValues.size());
         assertTrue(StringUtils.isNotBlank(idValues.get(0)));
-    }
-
-    @Test(expected=ConnectorException.class)
-    public void test210GroupCreate() {
-        Set<Attribute> attributes = new HashSet<>();
-        attributes.add(new AttributeBuilder().setName(BlueJeansGroupAttribute.GROUP_NAME.name()).addValue("Flinstones").build());
-        connector.create(ObjectClass.GROUP, attributes, new OperationOptionsBuilder().build());
-    }
-
-    @Test(expected=ConnectorException.class)
-    public void test220GroupModify() {
-        Set<Attribute> attributes = new HashSet<>();
-        attributes.add(new AttributeBuilder().setName(BlueJeansGroupAttribute.GROUP_NAME.name()).addValue("Flinstones2").build());
-
-        connector.update(ObjectClass.GROUP, new Uid("123"), attributes, new OperationOptionsBuilder().build());
-    }
-
-    @Test(expected=ConnectorException.class)
-    public void test230GroupsGet() {
-        List<String> idValues = new ArrayList<>();
-        List<String> nameValues = new ArrayList<>();
-        ResultsHandler resultsHandler = ConnectorTestUtils.buildResultsHandler(idValues, nameValues);
-
-        connector.executeQuery(ObjectClass.GROUP, "", resultsHandler, new OperationOptionsBuilder().build());
-    }
-
-    @Test(expected=ConnectorException.class)
-    public void test240GroupGet() {
-        List<String> idValues = new ArrayList<>();
-        List<String> nameValues = new ArrayList<>();
-        ResultsHandler resultsHandler = ConnectorTestUtils.buildResultsHandler(idValues, nameValues);
-
-        connector.executeQuery(ObjectClass.GROUP, "123", resultsHandler, new OperationOptionsBuilder().build());
-    }
-
-    @Test(expected=ConnectorException.class)
-    public void test290GroupDelete() {
-        connector.delete(ObjectClass.GROUP, new Uid("123"), new OperationOptionsBuilder().build());
     }
 
     @Test

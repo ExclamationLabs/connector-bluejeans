@@ -156,4 +156,15 @@ public class BlueJeansUser implements IdentityModel {
     public void setRoomSettings(BlueJeansUserRoomSettings roomSettings) {
         this.roomSettings = roomSettings;
     }
+
+    @Override
+    public boolean equals(Object input) {
+        return identityEquals(BlueJeansUser.class, this, input);
+    }
+
+    @Override
+    public int hashCode() {
+        return identityHashCode();
+    }
+
 }

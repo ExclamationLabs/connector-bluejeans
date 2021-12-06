@@ -19,14 +19,15 @@ import com.exclamationlabs.connid.base.bluejeans.configuration.BlueJeansConfigur
 import com.exclamationlabs.connid.base.bluejeans.driver.rest.BlueJeansDriver;
 import com.exclamationlabs.connid.base.connector.BaseFullAccessConnector;
 
+import com.exclamationlabs.connid.base.connector.authenticator.Authenticator;
 import org.identityconnectors.framework.spi.ConnectorClass;
 
 @ConnectorClass(displayNameKey = "bluejeans.connector.display", configurationClass = BlueJeansConfiguration.class)
-public class BlueJeansConnector extends BaseFullAccessConnector {
+public class BlueJeansConnector extends BaseFullAccessConnector<BlueJeansConfiguration> {
 
     public BlueJeansConnector() {
-
-        setAuthenticator(new BlueJeansAuthenticator());
+        super(BlueJeansConfiguration.class);
+        setAuthenticator((Authenticator) new BlueJeansAuthenticator());
         setDriver(new BlueJeansDriver());
         setAdapters(new BlueJeansUsersAdapter());
     }

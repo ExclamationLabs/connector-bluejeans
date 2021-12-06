@@ -5,10 +5,12 @@ import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansUserRoomSettings
 import com.exclamationlabs.connid.base.bluejeans.model.response.AllUsersResponse;
 import com.exclamationlabs.connid.base.bluejeans.model.response.CreateUserResponse;
 import com.exclamationlabs.connid.base.connector.driver.DriverInvocator;
+import com.exclamationlabs.connid.base.connector.results.ResultsFilter;
+import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BlueJeansUserInvocator implements DriverInvocator<BlueJeansDriver, BlueJeansUser> {
 
@@ -47,7 +49,8 @@ public class BlueJeansUserInvocator implements DriverInvocator<BlueJeansDriver, 
     }
 
     @Override
-    public List<BlueJeansUser> getAll(BlueJeansDriver driver, Map<String, Object> map) throws ConnectorException {
+    public Set<BlueJeansUser> getAll(BlueJeansDriver driver, ResultsFilter filter,
+                                     ResultsPaginator paginator, Integer max) throws ConnectorException {
         Long currentEnterpriseId = driver.getEnterpriseId();
         AllUsersResponse response = driver.executeGetRequest("enterprise/" + currentEnterpriseId +
                 "/users?fields=email", AllUsersResponse.class).getResponseObject();

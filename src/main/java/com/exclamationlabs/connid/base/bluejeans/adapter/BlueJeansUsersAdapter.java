@@ -13,6 +13,7 @@
 
 package com.exclamationlabs.connid.base.bluejeans.adapter;
 
+import com.exclamationlabs.connid.base.bluejeans.configuration.BlueJeansConfiguration;
 import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansUser;
 import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansUserRoomSettings;
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
@@ -22,8 +23,7 @@ import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.exclamationlabs.connid.base.bluejeans.attribute.BlueJeansUserAttribute.*;
@@ -31,7 +31,7 @@ import static com.exclamationlabs.connid.base.connector.attribute.ConnectorAttri
 import static org.identityconnectors.framework.common.objects.AttributeInfo.Flags.NOT_CREATABLE;
 import static org.identityconnectors.framework.common.objects.AttributeInfo.Flags.NOT_UPDATEABLE;
 
-public class BlueJeansUsersAdapter extends BaseAdapter<BlueJeansUser> {
+public class BlueJeansUsersAdapter extends BaseAdapter<BlueJeansUser, BlueJeansConfiguration> {
 
     @Override
     public ObjectClass getType() {
@@ -44,8 +44,8 @@ public class BlueJeansUsersAdapter extends BaseAdapter<BlueJeansUser> {
     }
 
     @Override
-    public List<ConnectorAttribute> getConnectorAttributes() {
-        List<ConnectorAttribute> result = new ArrayList<>();
+    public Set<ConnectorAttribute> getConnectorAttributes() {
+        Set<ConnectorAttribute> result = new HashSet<>();
         result.add(new ConnectorAttribute(USER_ID.name(), LONG, NOT_UPDATEABLE));
         result.add(new ConnectorAttribute(FIRST_NAME.name(), STRING));
         result.add(new ConnectorAttribute(LAST_NAME.name(), STRING));
@@ -85,8 +85,8 @@ public class BlueJeansUsersAdapter extends BaseAdapter<BlueJeansUser> {
     }
 
     @Override
-    protected List<Attribute> constructAttributes(BlueJeansUser user) {
-        List<Attribute> attributes = new ArrayList<>();
+    protected Set<Attribute> constructAttributes(BlueJeansUser user) {
+        Set<Attribute> attributes = new HashSet<>();
         attributes.add(AttributeBuilder.build(USER_ID.name(), user.getId()));
         attributes.add(AttributeBuilder.build(EMAIL_ID.name(), user.getEmailId()));
         attributes.add(AttributeBuilder.build(FIRST_NAME.name(), user.getFirstName()));
@@ -128,7 +128,8 @@ public class BlueJeansUsersAdapter extends BaseAdapter<BlueJeansUser> {
     }
 
     @Override
-    protected BlueJeansUser constructModel(Set<Attribute> attributes, boolean creation) {
+    protected BlueJeansUser constructModel(Set<Attribute> attributes, Set<Attribute> multiValueAdd,
+                                           Set<Attribute> multiValueRemove, boolean creation) {
         BlueJeansUser user = new BlueJeansUser();
         String idValue = AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes);
         if (idValue != null) {

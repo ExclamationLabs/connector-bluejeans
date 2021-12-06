@@ -15,13 +15,13 @@ package com.exclamationlabs.connid.base.bluejeans.model.response;
 
 import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansUser;
 
-import java.util.List;
+import java.util.Set;
 
 public class AllUsersResponse {
 
     private Integer count;
 
-    private List<BlueJeansUser> users;
+    private Set<BlueJeansUser> users;
 
     public Integer getCount() {
         return count;
@@ -31,11 +31,11 @@ public class AllUsersResponse {
         this.count = count;
     }
 
-    public List<BlueJeansUser> getUsers() {
+    public Set<BlueJeansUser> getUsers() {
         return users;
     }
 
-    public void setUsers(List<BlueJeansUser> users) {
+    public void setUsers(Set<BlueJeansUser> users) {
         this.users = users;
     }
 }

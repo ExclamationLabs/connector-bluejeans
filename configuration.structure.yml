@@ -1,0 +1,13 @@
+---
+name: 'BlueJeans'
+configurationClass:
+  name: 'BlueJeansConfiguration'
+  package: 'com.exclamationlabs.connid.base.bluejeans.configuration'
+rest: true # io-error-retries
+service: true # service-url
+security:
+  authenticator:
+    oauth2Password: true
+
+
+

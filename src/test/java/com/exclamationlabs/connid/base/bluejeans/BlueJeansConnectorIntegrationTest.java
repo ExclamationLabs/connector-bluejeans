@@ -106,13 +106,15 @@ public class BlueJeansConnectorIntegrationTest extends IntegrationTest {
 
     @Test
     public void test120UserModify() {
-        Set<Attribute> attributes = new HashSet<>();
-        attributes.add(new AttributeBuilder().setName(MIDDLE_NAME.name()).addValue("Bedrock").build());
-        attributes.add(new AttributeBuilder().setName(PARTICIPANT_PASSCODE.name()).addValue("8899").build());
+        Set<AttributeDelta> attributes = new HashSet<>();
+        attributes.add(new AttributeDeltaBuilder().setName(MIDDLE_NAME.name()).
+                addValueToReplace("Bedrock").build());
+        attributes.add(new AttributeDeltaBuilder().setName(PARTICIPANT_PASSCODE.name()).
+                addValueToReplace("8899").build());
 
-        Uid newId = connector.update(ObjectClass.ACCOUNT, new Uid(generatedUserId), attributes, new OperationOptionsBuilder().build());
-        assertNotNull(newId);
-        assertNotNull(newId.getUidValue());
+        Set<AttributeDelta> response = connector.updateDelta(ObjectClass.ACCOUNT, new Uid(generatedUserId), attributes, new OperationOptionsBuilder().build());
+        assertNotNull(response);
+        assertTrue(response.isEmpty());
     }
 
     @Test

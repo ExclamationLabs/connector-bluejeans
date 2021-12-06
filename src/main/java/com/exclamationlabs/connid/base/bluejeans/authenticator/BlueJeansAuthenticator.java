@@ -17,13 +17,13 @@ import com.exclamationlabs.connid.base.bluejeans.authenticator.model.BlueJeansAc
 import com.exclamationlabs.connid.base.bluejeans.authenticator.model.OAuthPasswordEntity;
 import com.exclamationlabs.connid.base.connector.authenticator.OAuth2TokenPasswordAuthenticator;
 import com.exclamationlabs.connid.base.connector.authenticator.model.OAuth2AccessTokenContainer;
-import com.exclamationlabs.connid.base.connector.configuration.ConnectorConfiguration;
+import com.exclamationlabs.connid.base.connector.authenticator.util.OAuth2TokenExecution;
+import com.exclamationlabs.connid.base.connector.configuration.basetypes.security.authenticator.Oauth2PasswordConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.Charsets;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -35,8 +35,6 @@ import org.identityconnectors.framework.common.exceptions.ConnectorSecurityExcep
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import static com.exclamationlabs.connid.base.connector.configuration.ConnectorProperty.*;
-
 /**
  * The BlueJeans auth response has a complex 'scope' object that has the user id in it that we need
  * to retrieve to properly integrate with BlueJeans.
@@ -45,12 +43,11 @@ public class BlueJeansAuthenticator extends OAuth2TokenPasswordAuthenticator {
 
     private static final Log LOG = Log.getLog(BlueJeansAuthenticator.class);
 
-    @Override
-    protected String executeRequest(ConnectorConfiguration configuration, HttpClient client, HttpPost request, UrlEncodedFormEntity entity, GsonBuilder gsonBuilder) throws IOException {
+    protected String executeRequest(Oauth2PasswordConfiguration configuration, HttpClient client, HttpPost request, GsonBuilder gsonBuilder) throws IOException {
         OAuthPasswordEntity postEntity = new OAuthPasswordEntity();
         postEntity.setGrantType("password");
-        postEntity.setUsername(configuration.getProperty(CONNECTOR_BASE_AUTH_OAUTH2_USERNAME));
-        postEntity.setPassword(configuration.getProperty(CONNECTOR_BASE_AUTH_OAUTH2_PASSWORD));
+        postEntity.setUsername(configuration.getOauth2Username());
+        postEntity.setPassword(configuration.getOauth2Password());
         setupJsonRequestBody(request, postEntity);
 
         getAdditionalAuthenticationHeaders(configuration).forEach(request::setHeader);
@@ -77,7 +74,7 @@ public class BlueJeansAuthenticator extends OAuth2TokenPasswordAuthenticator {
             // Set the 'scope' string of the normal container to the BlueJeans user id
             normalContainer.setScope("" + authResponse.getScope().getUser());
 
-            configuration.setOauth2Information(normalContainer);
+            configuration.setOauth2Information(normalContainer.toMap());
             return authResponse.getAccessToken();
         } else {
             throw new ConnectorSecurityException("Invalid/empty response received from OAuth2: " + rawJson);
@@ -86,13 +83,13 @@ public class BlueJeansAuthenticator extends OAuth2TokenPasswordAuthenticator {
 
 
     @Override
-    public String authenticate(ConnectorConfiguration configuration) throws ConnectorSecurityException {
-        initializeForHttp();
+    public String authenticate(Oauth2PasswordConfiguration configuration) throws ConnectorSecurityException {
+        OAuth2TokenExecution.initializeForHttp();
         HttpClient client = createClient();
         try {
-            HttpPost request = new HttpPost(configuration.getProperty(CONNECTOR_BASE_AUTH_OAUTH2_TOKEN_URL));
+            HttpPost request = new HttpPost(configuration.getTokenUrl());
             request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-            return executeRequest(configuration, client, request, null, gsonBuilder);
+            return executeRequest(configuration, client, request, gsonBuilder);
 
         } catch (IOException e) {
             throw new ConnectorSecurityException(

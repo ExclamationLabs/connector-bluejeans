@@ -13,18 +13,17 @@
 
 package com.exclamationlabs.connid.base.bluejeans.driver.rest;
 
+import com.exclamationlabs.connid.base.bluejeans.configuration.BlueJeansConfiguration;
 import com.exclamationlabs.connid.base.bluejeans.model.BlueJeansUser;
 import com.exclamationlabs.connid.base.bluejeans.model.response.EnterpriseProfileResponse;
-import com.exclamationlabs.connid.base.connector.configuration.ConnectorProperty;
 import com.exclamationlabs.connid.base.connector.driver.rest.BaseRestDriver;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestFaultProcessor;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.exceptions.ConnectorSecurityException;
 
-import java.util.Set;
 
-public class BlueJeansDriver extends BaseRestDriver {
+public class BlueJeansDriver extends BaseRestDriver<BlueJeansConfiguration> {
 
     private static final Log LOG = Log.getLog(BlueJeansDriver.class);
 
@@ -47,12 +46,7 @@ public class BlueJeansDriver extends BaseRestDriver {
 
     @Override
     protected String getBaseServiceUrl() {
-        return "https://api.bluejeans.com/v1/";
-    }
-
-    @Override
-    public Set<ConnectorProperty> getRequiredPropertyNames() {
-        return null;
+        return getConfiguration().getServiceUrl();
     }
 
     @Override
@@ -65,17 +59,15 @@ public class BlueJeansDriver extends BaseRestDriver {
     }
 
     private String getUserIdFromOAuthResponse() {
-        if (configuration.getOauth2Information() == null || configuration.getOauth2Information().getScope() == null) {
+        if (configuration.getOauth2Information() == null || configuration.getOauth2Information().get("scope") == null) {
             throw new ConnectorSecurityException(
                     "BlueJeans security error, OAuth response invalid or did not contain user id");
         }
-        return configuration.getOauth2Information().getScope();
+        return configuration.getOauth2Information().get("scope");
     }
 
     Long getEnterpriseId() {
-        if (enterpriseId != null) {
-            return enterpriseId;
-        } else {
+        if (enterpriseId == null) {
             String userId = getUserIdFromOAuthResponse();
             EnterpriseProfileResponse response = executeGetRequest("user/" + userId + "/enterprise_profile",
                     EnterpriseProfileResponse.class).getResponseObject();
@@ -85,8 +77,8 @@ public class BlueJeansDriver extends BaseRestDriver {
             }
             LOG.info("Enterprise id {0} retrieved from user id {1}", userId, response.getEnterprise());
             enterpriseId = response.getEnterprise();
-            return enterpriseId;
         }
+        return enterpriseId;
     }
 
 }

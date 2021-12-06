@@ -38,16 +38,16 @@ See XML files in src/test/resources folder for Midpoint examples.  resourceOverl
 resource configuration setup for Midpoint.
 
 ## Configuration properties
- 
-- CONNECTOR_BASE_CONFIGURATION_ACTIVE - Set this to Y to activate the configuration 
- 
-- CONNECTOR_BASE_AUTH_OAUTH2_TOKEN_URL - Currently is https://api.bluejeans.com/oauth2/token\#User
 
-- CONNECTOR_BASE_AUTH_OAUTH2_ENCODED_SECRET - Not used for this connector, this can be NA
+- service.serviceUrl - Should be set to `https://api.bluejeans.com/v1/`
+ 
+- security.authenticator.oauth2Password.tokenUrl - Currently is https://api.bluejeans.com/oauth2/token\#User
 
-- CONNECTOR_BASE_AUTH_OAUTH2_USERNAME - This is the username given to you after
+- security.authenticator.oauth2Password.encodedSecret - Not used for this connector, this can be NA
+
+- security.authenticator.oauth2Password.oauth2Username - This is the username given to you after
 you receive a developer account with BlueJeans.
 
-- CONNECTOR_BASE_AUTH_OAUTH2_PASSWORD - The password for your developer account.
+- security.authenticator.oauth2Password.oauth2Password - The password for your developer account.
 
 
